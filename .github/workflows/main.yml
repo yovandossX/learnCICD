@@ -25,22 +25,22 @@ jobs:
           echo "Listing all files recursively:"
           Get-ChildItem -Path . -Recurse -Name
           echo "Checking if .csproj exists:"
-          if (Test-Path "CICDTwo/CICDTwo.csproj") { echo "Project file found!" } else { echo "Project file NOT found"; exit 1 }
+          if (Test-Path "./CICDTwo/CICDTwo/CICDTwo.csproj") { echo "Project file found!" } else { echo "Project file NOT found"; exit 1 }
 
       - name: Restore dependencies
-        run: |
-          cd "cicdTwo/CICDTwo/CICDTwo"
-          dotnet restore "CICDTwo.csproj"
+        run: dotnet restore "./CICDTwo/CICDTwo/CICDTwo.csproj"
 
       - name: Build the project
-        run: |
-          cd "cicdTwo/CICDTwo/CICDTwo"
-          dotnet build "CICDTwo.csproj" --configuration Release
+        run: dotnet build "./CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release --no-restore
 
       - name: Publish the project
-        run: |
-          cd "cicdTwo/CICDTwo/CICDTwo"
-          dotnet publish "CICDTwo.csproj" --configuration Release --output ../../publish
+        run: dotnet publish "./CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release --output ./publish --no-build
+
+      - name: Archive Published Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: published-app
+          path: ./publish
 
   deploy:
     runs-on: windows-latest
@@ -49,6 +49,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Download Published Files
+        uses: actions/download-artifact@v3
+        with:
+          name: published-app
+          path: ./publish
 
       - name: Copy files to IIS server
         uses: appleboy/scp-action@v0.1.4
