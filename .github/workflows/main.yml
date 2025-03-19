@@ -1,4 +1,4 @@
-name: Deploy .NET 8 API to IIS
+name: Deploy .NET 8 API to Windows Server
 
 on:
   push:
@@ -38,31 +38,14 @@ jobs:
     needs: build
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Download Published Files
         uses: actions/download-artifact@v4
         with:
           name: published-app
           path: ./publish
 
-      - name: Copy files to IIS server (`D:\CICD`)
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: 37159
-          source: './publish/*'
-          target: 'D:/CICD'
-
-      - name: Restart IIS
-        uses: appleboy/ssh-action@v0.1.9
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: 37159
-          script: |
-            iisreset /restart
+      - name: Copy files to Windows Server (`D:\CICD`)
+        run: |
+          net use Z: \\103.24.202.137\C$ /user:mfsadmin "V%pI1aLgqUz(5ne"
+          robocopy ./publish Z:\CICD /E /NFL /NDL /NJH /NJS /NC /NS
+          net use Z: /delete
