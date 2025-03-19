@@ -19,13 +19,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./CICDTwo/CICDTwo.csproj  # Specify the correct path to the .csproj file
 
       - name: Build the project
-        run: dotnet build --configuration Release
+        run: dotnet build ./CICDTwo/CICDTwo.csproj --configuration Release  # Specify the .csproj file
 
       - name: Publish the project
-        run: dotnet publish --configuration Release --output ./publish
+        run: dotnet publish ./CICDTwo/CICDTwo.csproj --configuration Release --output ./publish  # Specify the .csproj file
 
   deploy:
     runs-on: windows-latest
