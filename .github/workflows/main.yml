@@ -46,6 +46,6 @@ jobs:
 
       - name: Copy files to Windows Server (`D:\CICD`)
         run: |
-          net use Z: \\103.24.202.137\C$ /user:mfsadmin "V%pI1aLgqUz(5ne"
-          robocopy ./publish Z:\CICD /E /NFL /NDL /NJH /NJS /NC /NS
+          net use Z: \\103.24.202.137\CICD /user:mfsadmin "V%pI1aLgqUz(5ne)"
+          robocopy ./publish Z:\ /E /NFL /NDL /NJH /NJS /NC /NS
           net use Z: /delete
