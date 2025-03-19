@@ -18,15 +18,6 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Debug - List all files and check path
-        run: |
-          echo "Current Directory:"
-          pwd
-          echo "Listing all files recursively:"
-          Get-ChildItem -Path . -Recurse -Name
-          echo "Checking if .csproj exists:"
-          if (Test-Path "./CICDTwo/CICDTwo/CICDTwo.csproj") { echo "Project file found!" } else { echo "Project file NOT found"; exit 1 }
-
       - name: Restore dependencies
         run: dotnet restore "./CICDTwo/CICDTwo/CICDTwo.csproj"
 
@@ -56,7 +47,7 @@ jobs:
           name: published-app
           path: ./publish
 
-      - name: Copy files to IIS server
+      - name: Copy files to IIS server (`D:\CICD`)
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -64,7 +55,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 37159
           source: './publish/*'
-          target: 'D:/inetpub/wwwroot/MyApp'
+          target: 'D:/CICD'
 
       - name: Restart IIS
         uses: appleboy/ssh-action@v0.1.9
