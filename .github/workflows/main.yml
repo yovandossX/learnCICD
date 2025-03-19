@@ -26,7 +26,7 @@ jobs:
           Get-ChildItem -Path . -Recurse -Name
 
       - name: Restore dependencies
-        run: dotnet restore "cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj"
+        run: dotnet restore "D:/Yovan Doss X/Learnings/CICD/GitActions/cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj"
 
       - name: Build the project
         run: dotnet build "cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release
