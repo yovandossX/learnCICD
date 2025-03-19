@@ -20,17 +20,20 @@ jobs:
 
       - name: List directory contents (debugging step)
         run: |
-          echo "Listing directory contents:"
+          echo "Listing directory contents of the root of the repository:"
+          dir .
+
+          echo "Listing directory contents of the cicdTwo directory:"
           dir ./cicdTwo
 
       - name: Restore dependencies
-        run: dotnet restore ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj  # Specify the correct relative path
+        run: dotnet restore ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj
 
       - name: Build the project
-        run: dotnet build ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj --configuration Release  # Specify the correct relative path
+        run: dotnet build ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj --configuration Release
 
       - name: Publish the project
-        run: dotnet publish ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj --configuration Release --output ./publish  # Specify the correct relative path
+        run: dotnet publish ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj --configuration Release --output ./publish
 
   deploy:
     runs-on: windows-latest
