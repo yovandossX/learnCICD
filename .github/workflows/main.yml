@@ -18,6 +18,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: List directory contents (debugging step)
+        run: |
+          echo "Listing directory contents:"
+          dir ./cicdTwo
+
       - name: Restore dependencies
         run: dotnet restore ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj  # Specify the correct relative path
 
