@@ -18,22 +18,21 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: List directory contents (debugging step)
+      - name: Debug - List directory contents
         run: |
-          echo "Listing directory contents of the root of the repository:"
-          dir .
-
-          echo "Listing directory contents of the cicdTwo directory:"
-          dir ./cicdTwo
+          echo "Current Directory:"
+          pwd
+          echo "Listing all files recursively:"
+          ls -R
 
       - name: Restore dependencies
-        run: dotnet restore ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj
+        run: dotnet restore "./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj"
 
       - name: Build the project
-        run: dotnet build ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj --configuration Release
+        run: dotnet build "./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release
 
       - name: Publish the project
-        run: dotnet publish ./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj --configuration Release --output ./publish
+        run: dotnet publish "./cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release --output ./publish
 
   deploy:
     runs-on: windows-latest
@@ -43,17 +42,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Copy files to server
-        uses: appleboy/ssh-action@v0.1.9
+      - name: Copy files to the IIS server
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 37159
           source: './publish/*'
-          target: '/path/to/your/iis/site'
+          target: 'D:/inetpub/wwwroot/MyApp'
 
-      - name: Restart IIS site
+      - name: Restart IIS
         uses: appleboy/ssh-action@v0.1.9
         with:
           host: ${{ secrets.SERVER_IP }}
