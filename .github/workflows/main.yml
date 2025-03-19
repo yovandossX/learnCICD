@@ -18,21 +18,29 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Debug - List all files and folders
+      - name: Debug - List all files and check path
         run: |
           echo "Current Directory:"
           pwd
           echo "Listing all files recursively:"
           Get-ChildItem -Path . -Recurse -Name
+          echo "Checking if .csproj exists:"
+          if (Test-Path "cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj") { echo "Project file found!" } else { echo "Project file NOT found"; exit 1 }
 
       - name: Restore dependencies
-        run: dotnet restore "D:/Yovan Doss X/Learnings/CICD/GitActions/cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj"
+        run: |
+          cd "cicdTwo/CICDTwo/CICDTwo"
+          dotnet restore "CICDTwo.csproj"
 
       - name: Build the project
-        run: dotnet build "cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release
+        run: |
+          cd "cicdTwo/CICDTwo/CICDTwo"
+          dotnet build "CICDTwo.csproj" --configuration Release
 
       - name: Publish the project
-        run: dotnet publish "cicdTwo/CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release --output ./publish
+        run: |
+          cd "cicdTwo/CICDTwo/CICDTwo"
+          dotnet publish "CICDTwo.csproj" --configuration Release --output ../../publish
 
   deploy:
     runs-on: windows-latest
@@ -42,7 +50,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Copy files to the IIS server
+      - name: Copy files to IIS server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SERVER_IP }}
