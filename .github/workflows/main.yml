@@ -1,51 +1,57 @@
-name: Deploy .NET 8 API to Windows Server
+name: Build and Deploy .NET API to Windows Server
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '8.0.x' # or your target version
 
       - name: Restore dependencies
-        run: dotnet restore "./CICDTwo/CICDTwo/CICDTwo.csproj"
+        run: dotnet restore
 
-      - name: Build the project
-        run: dotnet build "./CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release --no-restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
 
-      - name: Publish the project
-        run: dotnet publish "./CICDTwo/CICDTwo/CICDTwo.csproj" --configuration Release --output ./publish --no-build
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
 
-      - name: Archive Published Files
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: published-app
+          name: api-publish
           path: ./publish
 
   deploy:
     runs-on: windows-latest
     needs: build
-
     steps:
-      - name: Download Published Files
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: published-app
+          name: api-publish
           path: ./publish
 
-      - name: Copy files to Windows Server (`D:\CICD`)
-        run: |
-          net use Z: \\103.24.202.137\CICD /user:mfsadmin "V%pI1aLgqUz(5ne)"
-          robocopy ./publish Z:\ /E /NFL /NDL /NJH /NJS /NC /NS
-          net use Z: /delete
+      - name: Deploy to Windows Server via WinRM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 5986 # WinRM HTTPS default
+          script: |
+            # Update this path to match your server's directory
+            $destPath = "C:\inetpub\wwwroot\YourApi"
+            Remove-Item -Recurse -Force $destPath\*  # Clean up old files
+            Copy-Item -Path .\publish\* -Destination $destPath -Recurse
+            # Optionally restart IIS
+            iisreset
