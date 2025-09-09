@@ -1,0 +1,8 @@
+# frontend directory -> request frontend team or user
+/frontend/ @your-org/frontend-team
+
+# backend directory -> request backend team or user
+/backend/ @your-org/backend-team
+
+# fallback — file owner
+* @your-github-username
